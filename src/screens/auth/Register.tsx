@@ -1,45 +1,55 @@
-import { useState } from "react";
-import { Grid, Box, Paper, Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Grid, Box, Paper, Typography, useTheme, List, ListItem, Divider, Button } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FieldValues } from 'react-hook-form/dist/types';
 import { tokens } from "../../theme";
 import InputController from "../../components/formControlHelper/InputController";
 import { EmailOutlined, LocalPhoneOutlined, LocationOnOutlined, PublicOutlined, MyLocationOutlined } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { routePath } from "../../routerPath";
 import { LoadingButton } from "@mui/lab";
 import { authModel } from '../../models/auth.model'
 import { joiResolver } from "@hookform/resolvers/joi";
-import { IRegister } from "../../interfaces/auth.interface";
+import { IRegister, IRegisterComplete } from "../../interfaces/auth.interface";
 import { authValidation } from "../../validations/auth.validation";
-import { setFormErrors } from "../../services/helperService";
+import { hashing, setFormErrors } from "../../services/helperService";
+import { useSnackbar } from 'notistack';
 
 const Register = () => {
+    const { enqueueSnackbar } = useSnackbar();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    const { register } = useParams()
 
     const _userRegister = authModel.UserRegister()
     const { handleSubmit, control, setError, reset } = useForm({ resolver: joiResolver(authValidation.register()) });
 
     const [_isLoading, _setLoading] = useState(false);
-    const [_regCompleted, setRegCompleted] = useState(false);
+    const [_regCompleted, setRegCompleted] = useState<IRegisterComplete | null>(null);
+
+
+    useEffect(() => {
+        if (register) setRegCompleted(JSON.parse(decodeURIComponent(hashing.decrypt(register))))
+    }, [register])
+
 
     const _validate: SubmitHandler<FieldValues> = (data: FieldValues) => {
         _setLoading(true);
+        setTimeout(() => {}, 2000)
         const registerData: IRegister = data as IRegister;
 
         _userRegister.mutate(registerData, {
-            onSuccess: () => {
+            onSuccess: (data: any) => {
                 reset()
-                // navigate(routePath.accounts.registerEmailVerify);
+                navigate(routePath.auth.register + '/' + encodeURIComponent(hashing.encrypt(JSON.stringify(data))))
                 _setLoading(false);
-                setRegCompleted(true)
             },
             onError: (error: any) => {
                 if (error.response?.data.status === 'unprocessable') {
                     setFormErrors(error, setError);
                 } else {
-
+                    enqueueSnackbar('Something when error', { variant: 'error', autoHideDuration: 3000, preventDuplicate: true });
                 }
                 _setLoading(false);
             },
@@ -244,14 +254,41 @@ const Register = () => {
                         </Box>
                     </form>
                 }
-                {_regCompleted && <Box mt='20px' display='flex' justifyContent={'end'}>
-                    <Box width={'75%'} p='15px' height={'25vh'} bgcolor={colors.yellowAccent[600]}>
-                        <Typography variant='h3'
-                            color={colors.blueAccent[100]}
-                            fontWeight='bold'
-                            sx={{ m: "0 0 5px 0" }}>sdfsfad</Typography>
+                {_regCompleted && <>
+                    <Box width={'75%'} display={'flex'} mt='20px' p='15px' bgcolor={colors.yellowAccent[500]}>
+                        <Typography variant='h4'
+                            color={'black'}
+                            fontWeight='bolder'
+                            sx={{ m: "0 0 5px 0" }}>
+                            <List sx={{ width: '100%', maxWidth: 360 }}>
+                                <ListItem alignItems="flex-start">
+                                    synalId: {_regCompleted?.synalId}
+                                </ListItem>
+                                <Divider variant="middle" />
+                                <ListItem alignItems="flex-start">
+                                    Name: {_regCompleted?.name}
+                                </ListItem>
+                                <Divider variant="middle" />
+                                <ListItem alignItems="flex-start">
+                                    Email Address: {_regCompleted?.emailAddress}
+                                </ListItem>
+                                <Divider variant="middle" />
+                                <ListItem alignItems="flex-start">
+                                    Password: {_regCompleted?.password}
+                                </ListItem>
+                            </List>
+                        </Typography>
                     </Box>
-                </Box>}
+
+                    <Box mt={"25px"} sx={{ fontWeight: "bolder", marginBottom: "5px", textAlign: 'center' }}>
+                        <Button
+                            variant="contained"
+                            color={"primary"}
+                            onClick={() => navigate(routePath.auth.login)}>
+                            Log in now
+                        </Button>
+                    </Box>
+                </>}
 
             </Paper>
         </Box>

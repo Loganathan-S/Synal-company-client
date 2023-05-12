@@ -169,7 +169,7 @@ export const themeSettings = (mode: string): any => {
         : {
           // palette values for light mode
           primary: {
-            main: colors.blueAccent[500],
+            main: colors.blueAccent[300],
           },
           secondary: {
             main: colors.greenAccent[500],

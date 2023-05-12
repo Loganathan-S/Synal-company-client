@@ -1,21 +1,54 @@
 import { useState } from "react";
 import { Box, Paper, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { FieldValues } from 'react-hook-form/dist/types';
 import InputController from "../../components/formControlHelper/InputController";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import { routePath } from "../../routerPath";
+import { useSnackbar } from 'notistack';
+import { ILogin } from '../../interfaces/auth.interface'
+import { authModel } from '../../models/auth.model'
+import { setFormErrors } from "../../services/helperService";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const [_isLoading, _setLoading] = useState(false);
+  const queryClient = useQueryClient()
+  
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { handleSubmit, control } = useForm();
+  
+  const _userLogin = authModel.UserLogin()
+  const { handleSubmit, control, setError, reset } = useForm();
 
-  const _validate = (data: any) => {
+  const _validate: SubmitHandler<FieldValues> = (data: FieldValues) => {
     _setLoading(true);
+    const loginData: ILogin = data as ILogin;
+    setTimeout(() => { 
+      _userLogin.mutate(loginData, {
+        onSuccess: (data: any) => {
+          reset()
+          localStorage.setItem('userDetails', encodeURIComponent(JSON.stringify(data)))
+          queryClient.invalidateQueries(['userDetails'])
+          navigate(routePath.home)
+          _setLoading(false);
+        },
+        onError: (error: any) => {
+          if (error.response?.data.status === 'unprocessable') {
+            setFormErrors(error, setError);
+          } else {
+            enqueueSnackbar('Something when error', { variant: 'error', autoHideDuration: 3000, preventDuplicate: true });
+          }
+          _setLoading(false);
+        },
+      })
+    }, 2000)
   };
+  
 
   return (
     <Box m='20px'>
@@ -40,16 +73,17 @@ const Login = () => {
         >
           <Box mt={"20px"}>
             <InputController
-              inputType='email'
-              label='Email Address'
+              inputType='text'
+              label='Email Address or User ID'
+              id='keyUser'
               inputProps={{
-                name: "email",
+                name: "keyUser",
                 control: control,
                 defaultValue: "",
                 rules: {
                   required: {
                     value: true,
-                    message: "Requried valid email address",
+                    message: "Requried valid email address or User ID",
                   },
                 },
               }}
@@ -59,8 +93,9 @@ const Login = () => {
             <InputController
               inputType='password'
               label='Password'
+              id='keyPassword'
               inputProps={{
-                name: "password",
+                name: "keyPassword",
                 control: control,
                 defaultValue: "",
                 rules: {
@@ -85,7 +120,7 @@ const Login = () => {
               className='px-5'
               loading={_isLoading}
             >
-              Pay Now
+              Login
             </LoadingButton>
             <Link
               to='/'

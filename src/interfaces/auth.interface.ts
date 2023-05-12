@@ -8,3 +8,15 @@ export interface IRegister {
   city: string;
   pincode: number;
 }
+
+export interface IRegisterComplete {
+  name?: string;
+  emailAddress?: string;
+  synalId?: string;
+  password?: string;
+}
+
+export interface ILogin { 
+  keyUser: string;
+  keyPassword: string;
+}
