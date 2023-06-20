@@ -1,51 +1,77 @@
-import React, { useEffect } from "react";
-import { Box, Paper, Button, useTheme } from "@mui/material";
-import { tokens } from "../../theme";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
+import { CompanyContext } from "../../context/CompanyContext";
 import { useNavigate } from "react-router-dom";
 import { routePath } from "../../routerPath";
 
-
 const DeviceList = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const queryClient = useQueryClient()
+  const {  companyList,selectedComapny } = useContext(CompanyContext);
+  // console.log(companyInfo);
   const navigate = useNavigate();
 
-  const fetch = () => {
-    return JSON.parse(decodeURIComponent(localStorage.getItem('userDetails') as string))
-  }
-  const getUserQuery = useQuery({
-    queryKey: ['userDetails'],
-    queryFn: () => fetch()
-  })
-
-  const logout = () => {
-
-    queryClient.clear()
-    localStorage.clear()
-    navigate(routePath.auth.login)
-  }
+  const viewCompanyInfo = (id: number) => {
+     navigate(routePath.app.companydetails,{ state: id });
+    // console.log(id);  
+    selectedComapny(id);
+  };
 
   return (
-    <Box>
-      <Paper
-        elevation={1}
-        sx={{ display: "flex", justifyContent: "space-between" }}
-      >
-        <Button
-          onClick={logout}
-          sx={{
-            px: "5em",
-            py: "10px",
-            fontSize: "1.5rem",
-            borderRadius: "15px",
-          }}
-        >
-          Logout
-        </Button>
-      </Paper>
-    </Box>
+    // <Box>
+    //   <Paper
+    //     elevation={1}
+    //     sx={{ display: "flex", justifyContent: "space-between" }}
+    //   >
+    //     <Button
+    //       onClick={logout}
+    //       sx={{
+    //         px: "5em",
+    //         py: "10px",
+    //         fontSize: "1.5rem",
+    //         borderRadius: "15px",
+    //       }}
+    //     >
+    //       Logout
+    //     </Button>
+    //   </Paper>
+    // </Box>
+
+    <div className="row d-flex justify-content-center mt-2 min-vh-100 ">
+      <div className="col-md-12">
+        <h5 className="">Company</h5>
+        <div className="table-responsive">
+            <table className="table table-hover table-sm table-bordered text-center">
+              <thead>
+                <tr>
+                  <th scope="">S.No</th>
+                  <th scope="">Company Name</th>
+                  <th scope="">Managing Director</th>
+                  <th scope="">Website</th>
+                  <th scope="">Country</th>
+                  <th scope="">More Info</th>
+                </tr>
+              </thead>
+              <tbody className="">
+                {companyList?.map((info, index) => (
+                  <tr key={index}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{info.companyName}</td>
+                    <td>{info.managingDirector.charAt(0).toUpperCase() + info.managingDirector.slice(1)}</td>
+                    <td>{info.internetAddress}</td>
+                    <td>{info.country.charAt(0).toUpperCase() + info.country.slice(1)}</td>
+                    <td>
+                      <button
+                        className="btn btn-outline-primary px-3 btn-sm "
+                        onClick={() => viewCompanyInfo(info.id)}
+                      >
+                        view
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          </div>
+        </div>
   );
 };
 

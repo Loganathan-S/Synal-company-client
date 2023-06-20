@@ -6,12 +6,16 @@ import {CssBaseline, ThemeProvider} from "@mui/material";
 import {ColorModeContext, useMode} from "./theme";
 import AppLayout from "./components/layouts/appLayout";
 import { CompanyProvider } from "./context/CompanyContext";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap/dist/js/bootstrap.bundle";
 
 const Login = lazy(() => import("./screens/auth/Login"));
 const Register = lazy(() => import("./screens/auth/Register"));
 const DeviceList = lazy(() => import("./screens/deviceList"));
 
-const CompanyList = lazy(() => import("./screens/company"));
+const CompanyDetails = lazy(() => import("./screens/deviceList/CompanyDetails"));
+
+// const CompanyList = lazy(() => import("./screens/company"));
 
 function App() {
     const [theme, colorMode] = useMode();
@@ -29,8 +33,9 @@ function App() {
                         </Route>
                     </Route>
                     <Route path={routePath.home} element={<AppLayout/>}>
-                        {/* <Route index element={<Suspense fallback={null}><DeviceList/></Suspense>}/> */}
-                        <Route index element={<Suspense fallback={null}><CompanyList/></Suspense>}/>
+                        <Route index element={<Suspense fallback={null}><DeviceList/></Suspense>}/>
+                        <Route path = {routePath.app.companydetails} element={<Suspense fallback={null}><CompanyDetails/></Suspense>}/>
+                        {/* <Route index element={<Suspense fallback={null}><CompanyList/></Suspense>}/> */}
                     </Route>
                 </Routes>
               </ThemeProvider>

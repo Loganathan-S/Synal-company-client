@@ -12,8 +12,12 @@ export const routePath = {
     logout: base + "auth/logout",
     register: base + "auth/register",
     forgotPassword: base + "auth/forgot-password",
-    companylist:base + "companylist"
+    companylist:base + "companylist",
+    
   },
+  app:{
+    companydetails : base + "companydetails"
+  }
    
 };
 
