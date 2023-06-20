@@ -1,3 +1,5 @@
+
+
 export interface IRegister {
   firstName: string;
   lastName: string;
@@ -20,3 +22,6 @@ export interface ILogin {
   keyUser: string;
   keyPassword: string;
 }
+
+
+

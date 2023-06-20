@@ -34,7 +34,7 @@ const Login = () => {
           reset()
           localStorage.setItem('userDetails', encodeURIComponent(JSON.stringify(data)))
           queryClient.invalidateQueries(['userDetails'])
-          navigate(routePath.home)
+          navigate(routePath.auth.companylist);
           _setLoading(false);
         },
         onError: (error: any) => {

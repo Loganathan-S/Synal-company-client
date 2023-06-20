@@ -5,19 +5,23 @@ import {routePath} from "./routerPath";
 import {CssBaseline, ThemeProvider} from "@mui/material";
 import {ColorModeContext, useMode} from "./theme";
 import AppLayout from "./components/layouts/appLayout";
+import { CompanyProvider } from "./context/CompanyContext";
 
 const Login = lazy(() => import("./screens/auth/Login"));
 const Register = lazy(() => import("./screens/auth/Register"));
 const DeviceList = lazy(() => import("./screens/deviceList"));
 
+const CompanyList = lazy(() => import("./screens/company"));
+
 function App() {
     const [theme, colorMode] = useMode();
     return (
         <ColorModeContext.Provider value={colorMode}>
-            <ThemeProvider theme={theme}>
-                <CssBaseline/>
-                <Routes>
-                    <Route path={routePath.auth.home} element={<AuthLayout/>}>
+            <CompanyProvider>
+              <ThemeProvider theme={theme}>
+                 <CssBaseline/>
+                  <Routes>
+                     <Route path={routePath.auth.home} element={<AuthLayout/>}>
                         <Route path={routePath.auth.login} element={<Suspense fallback={null}><Login/></Suspense>}/>
                         <Route path={routePath.auth.register}>
                             <Route index element={<Suspense fallback={null}><Register /></Suspense>} />
@@ -25,10 +29,12 @@ function App() {
                         </Route>
                     </Route>
                     <Route path={routePath.home} element={<AppLayout/>}>
-                        <Route index element={<Suspense fallback={null}><DeviceList/></Suspense>}/>
+                        {/* <Route index element={<Suspense fallback={null}><DeviceList/></Suspense>}/> */}
+                        <Route index element={<Suspense fallback={null}><CompanyList/></Suspense>}/>
                     </Route>
                 </Routes>
-            </ThemeProvider>
+              </ThemeProvider>
+            </CompanyProvider>
         </ColorModeContext.Provider>
 
     );
