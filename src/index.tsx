@@ -23,7 +23,7 @@ root.render(
          <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
             <QueryClientProvider client={queryClient}>
                <App />
-               <ReactQueryDevtools />
+               {/* <ReactQueryDevtools /> */}
             </QueryClientProvider>
          </SnackbarProvider>
       </BrowserRouter>

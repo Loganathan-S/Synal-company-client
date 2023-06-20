@@ -1,6 +1,6 @@
 const base = "/";
 
-const baseApiRoot = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:4000/' : null
+const baseApiRoot = process.env.NODE_ENV === 'development' ? 'http://192.168.1.210:4000/' : null
 const baseApi = baseApiRoot + "api"
 
 export const routePath = {
