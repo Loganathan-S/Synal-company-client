@@ -63,7 +63,7 @@ const Login = () => {
             fontWeight='bold'
             sx={{ m: "0 0 5px 0" }}
           >
-            Login
+            Login form
           </Typography>
         </Box>
         <form
